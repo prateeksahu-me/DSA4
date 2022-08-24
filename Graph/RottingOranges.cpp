@@ -1,55 +1,53 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-bool isSafe(vector < vector < int >> & grid, int i, int j) {
-  int n = grid.size();
-  int m = grid[0].size();
-  return (i >= 0 && j >= 0 && i < n && j < m);
+const int dx[] = { 1, 0, -1, 0};
+const int dy[] = {0, 1, 0, -1};
+bool isSafe(vector < vector < int >> & grid, int x, int y) {
+  int r = grid.size();
+  int c = grid[0].size();
+  return (x >= 0 && x < r && y >= 0 && y < c && grid[x][y] == 1);
 }
 
-
 int rottingOranges(vector<vector<int>>& grid) {
- int days = 2;
-  bool flag = false;
-  int n = grid.size();
-  int m = grid[0].size();
-  while (1) {
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < m; j++) {
-        if (grid[i][j] == days) {
-          if (isSafe(grid, i + 1, j) && grid[i + 1][j] == 1) {
-            grid[i + 1][j] = grid[i][j] + 1;
-            flag = true;
-          }
-          if (isSafe(grid, i, j + 1) && grid[i][j + 1] == 1) {
-            grid[i][j + 1] = grid[i][j] + 1;
-            flag = true;
-          }
-          if (isSafe(grid, i - 1, j) && grid[i - 1][j] == 1) {
-            grid[i - 1][j] = grid[i][j] + 1;
-            flag = true;
-          }
-          if (isSafe(grid, i, j - 1) && grid[i][j - 1] == 1) {
-            grid[i][j - 1] = grid[i][j] + 1;
-            flag = true;
-          }
+ int r = grid.size();
+  int c = grid[0].size();
+  queue < pair < int, int >> q;
+  for (int i = 0; i < r; i++) {
+    for (int j = 0; j < c; j++) {
+      if (grid[i][j] == 2) {
+        q.push({ i,  j });
+      }
+    }
+  }
+  int days = -2;
+  while (!q.empty()) {
+    int qs = q.size();
+    while (qs--) {
+      pair < int, int > p = q.front();
+      int x = p.first;
+      int y = p.second;
+      q.pop();
+      for (int i = 0; i < 4; i++) {
+        if (isSafe(grid, x + dx[i], y + dy[i])) {
+          q.push({
+            x + dx[i],
+            y + dy[i]
+          });
+          grid[x + dx[i]][y + dy[i]] = 2;
         }
       }
     }
-    if (flag == false) {
-      break;
-    }
-    flag = false;
-    days++;
+    days += 1;
   }
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
+  for (int i = 0; i < r; i++) {
+    for (int j = 0; j < c; j++) {
       if (grid[i][j] == 1) {
-        days = -1;
+        return -1;
       }
     }
   }
-  return days == -1 ? days : days - 2;
+  return days == -2 ? 0 : days + 1;
 }
 
 int main() {
